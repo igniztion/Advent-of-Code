@@ -5,28 +5,19 @@ type Movement  = {
     Amount: int
 }
 
-type Point = {
-    X: int
-    Z: int
-}
-
 let moveSequence = 
     File.ReadLines "./input"
     |> Seq.map (fun x -> x.Split(' ')) 
     |> Seq.map (fun x -> { Direction = x.[0]; Amount = int x.[1]})
 
-let movePoint p m =
+let movePoint (x,y) (m : Movement) =
     match m with
-    | { Direction = "forward"; Amount = amount} -> { X = p.X + amount; Z = p.Z }
-    | { Direction = "up"; Amount = amount} -> { X = p.X; Z = p.Z - amount }
-    | { Direction = "down"; Amount = amount} -> { X = p.X; Z = p.Z + amount }
-    | _ -> p
+    | { Direction = "forward"; Amount = a} -> (x + a, y)
+    | { Direction = "up"; Amount = a} -> (x, y - a)
+    | { Direction = "down"; Amount = a} -> (x, y + a)
+    | _ -> (x,y)
 
-let startingPoint = { X = 0; Z = 0 } 
-
-let result = 
-    moveSequence
-    |> Seq.fold movePoint startingPoint
-    |> fun p -> p.X * p.Z
-
-printfn "Result: %i" result
+moveSequence
+|> Seq.fold movePoint (0,0)
+|> fun (x,y) -> x * y
+|> printfn "Result: %i"
